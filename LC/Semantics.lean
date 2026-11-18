@@ -57,6 +57,15 @@ lemma val_nf {t : Term τ} : Val t → NormalForm CBV t := by
   cases v <;> contradiction
 
 -- SF2: Smallstep
+theorem cbn_det : Deterministic (@CBN τ) := by
+  intro t t₁ t₂ ht₁ ht₂
+  induction ht₁ generalizing t₂ with
+  | app hs₁ ih =>
+    cases ht₂ with
+    | app hs₁' => rw [ih _ hs₁']
+    | abs => contradiction
+  | abs => cases ht₂ <;> trivial
+
 theorem cbv_det : Deterministic (@CBV τ) := by
   intro t t₁ t₂ ht₁ ht₂
   induction ht₁ generalizing t₂ with
