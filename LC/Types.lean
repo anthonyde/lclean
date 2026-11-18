@@ -57,7 +57,7 @@ lemma canon_fn {T₁ T₂ : Ty} {t : Term Ty} : Val t → (⬝ ⊢ t : T₁ ⤳ 
     exact ⟨_, rfl⟩
 
 -- TAPL 9.3.5
-theorem progress {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → Val t ∨ (∃ t', t ⟶ t') := by
+theorem progress {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → Val t ∨ (∃ t', t ⟶v t') := by
   intro hT
   induction t generalizing T with
   | a =>
@@ -233,7 +233,7 @@ lemma β_pres {n : Nat} {Γ : Ctx n} {T T' : Ty} {t t' : Term Ty} :
   exact β_pres'
 
 -- TAPL 9.3.9
-theorem preservation {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶ t') → ⬝ ⊢ t' : T := by
+theorem preservation {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶v t') → ⬝ ⊢ t' : T := by
   intro hT hs
   induction hs generalizing T with
   | app₁ ht₁ ih₁ =>

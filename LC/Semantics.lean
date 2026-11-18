@@ -40,8 +40,8 @@ inductive CBV : Term τ → Term τ → Prop
     Val v →
     CBV (.app (.abs T t) v) (↑⁻¹[0 ↦ ↑¹v] t)
 
-notation t " ⟶ " t' => CBV t t'
-notation t " ⟶* " t' => Multi CBV t t'
+notation t " ⟶v " t' => CBV t t'
+notation t " ⟶*v " t' => Multi CBV t t'
 
 example {T : τ} : CBN (.app (.abs T (.var 0)) .a) .a := by
   exact .abs
@@ -113,7 +113,7 @@ lemma val_halts {v : Term τ} : Val v → Halts CBV v := by
   exists v
   exact ⟨.refl, val_nf hv⟩
 
-lemma multi_app₂ {v t₂ t₂' : Term τ} : Val v → (t₂ ⟶* t₂') → .app v t₂ ⟶* .app v t₂' := by
+lemma multi_app₂ {v t₂ t₂' : Term τ} : Val v → (t₂ ⟶*v t₂') → .app v t₂ ⟶*v .app v t₂' := by
   intro hv ht₂
   induction ht₂ with
   | refl => exact .refl

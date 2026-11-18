@@ -38,7 +38,7 @@ lemma R_closed_wt {T : Ty} {t : Term Ty} : R T t → ⬝ ⊢ t : T := by
   obtain ⟨hT, hH, -⟩ := hR
   exact hT
 
-lemma cbv_pres_halt {t t' : Term Ty} (ht : t ⟶ t') : Halts CBV t ↔ Halts CBV t' := by
+lemma cbv_pres_halt {t t' : Term Ty} (ht : t ⟶v t') : Halts CBV t ↔ Halts CBV t' := by
   constructor
   · intro hH
     obtain ⟨s'', ht, hN⟩ := hH
@@ -56,7 +56,7 @@ lemma cbv_pres_halt {t t' : Term Ty} (ht : t ⟶ t') : Halts CBV t ↔ Halts CBV
     exists t''
     exact ⟨.step ht ht', hN⟩
 
-lemma cbv_pres_R' {T : Ty} {t t' : Term Ty} : (t ⟶ t') → R T t → R T t' := by
+lemma cbv_pres_R' {T : Ty} {t t' : Term Ty} : (t ⟶v t') → R T t → R T t' := by
   intro ht hR
   induction T generalizing t t' with
   | a =>
@@ -72,7 +72,7 @@ lemma cbv_pres_R' {T : Ty} {t t' : Term Ty} : (t ⟶ t') → R T t → R T t' :=
     · intro s hR₁
       exact ih₂ (.app₁ ht) (hR _ hR₁)
 
-lemma cbv_pres_R'' {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶ t') → R T t' → R T t := by
+lemma cbv_pres_R'' {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶v t') → R T t' → R T t := by
   intro hT ht hR
   induction T generalizing t t' with
   | a =>
@@ -89,11 +89,11 @@ lemma cbv_pres_R'' {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶ t') �
       exact ih₂ (.app hT (R_closed_wt hR₁)) (.app₁ ht) (hR _ hR₁)
 
 -- TAPL 12.1.4
-lemma cbv_pres_R {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶ t') → (R T t ↔ R T t') := by
+lemma cbv_pres_R {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶v t') → (R T t ↔ R T t') := by
   intro hT ht
   exact ⟨cbv_pres_R' ht, cbv_pres_R'' hT ht⟩
 
-lemma multi_pres_R {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶* t') → (R T t ↔ R T t') := by
+lemma multi_pres_R {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶*v t') → (R T t ↔ R T t') := by
   intro hT ht
   induction ht with
   | refl => rfl
