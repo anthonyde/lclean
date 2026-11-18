@@ -46,6 +46,23 @@ inductive CBV : Term τ → Term τ → Prop
 notation t " ⟶v " t' => CBV t t'
 notation t " ⟶*v " t' => Multi CBV t t'
 
+-- Full β-reduction semantics
+inductive Beta : Term τ → Term τ → Prop
+  | abs : ∀ {T t t'},
+    Beta t t' →
+    Beta (.abs T t) (.abs T t')
+  | app₁ : ∀ {t₁ t₁' t₂},
+    Beta t₁ t₁' →
+    Beta (.app t₁ t₂) (.app t₁' t₂)
+  | app₂ : ∀ {t₁ t₂ t₂'},
+    Beta t₂ t₂' →
+    Beta (.app t₁ t₂) (.app t₁ t₂')
+  | appabs : ∀ {T t₁ t₂},
+    Beta (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂] t₁)
+
+notation t " ⟶β " t' => Beta t t'
+notation t " ⟶*β " t' => Multi Beta t t'
+
 example {T : τ} : CBN (.app (.abs T (.var 0)) .a) .a := by
   exact .abs
 
