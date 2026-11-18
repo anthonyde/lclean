@@ -22,6 +22,9 @@ inductive CBN : Term τ → Term τ → Prop
   | abs : ∀ {T t₁ t₂},
     CBN (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂] t₁)
 
+notation t " ⟶n " t' => CBN t t'
+notation t " ⟶*n " t' => Multi CBN t t'
+
 -- Call-by-value semantics
 inductive Val : Term τ → Prop
   | a :
