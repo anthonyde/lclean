@@ -63,6 +63,26 @@ inductive Beta : Term τ → Term τ → Prop
 notation t " ⟶β " t' => Beta t t'
 notation t " ⟶*β " t' => Multi Beta t t'
 
+-- Takahashi1995 Def. 1.1
+-- Parallel β-reduction semantics
+inductive PBeta : Term τ → Term τ → Prop
+  | refl : ∀ {t},
+    PBeta t t
+  | abs : ∀ {T t t'},
+    PBeta t t' →
+    PBeta (.abs T t) (.abs T t')
+  | app : ∀ {t₁ t₁' t₂ t₂'},
+    PBeta t₁ t₁' →
+    PBeta t₂ t₂' →
+    PBeta (.app t₁ t₂) (.app t₁' t₂')
+  | appabs : ∀ {T t₁ t₁' t₂ t₂'},
+    PBeta t₁ t₁' →
+    PBeta t₂ t₂' →
+    PBeta (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂'] t₁')
+
+notation t " ⟹β " t' => PBeta t t'
+notation t " ⟹*β " t' => Multi PBeta t t'
+
 example {T : τ} : CBN (.app (.abs T (.var 0)) .a) .a := by
   exact .abs
 
