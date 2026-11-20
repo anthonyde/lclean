@@ -216,7 +216,7 @@ lemma β_pres' {n : Nat} {Γ : Ctx n} {T T' : Ty} {t t' : Term Ty} {c : Fin (n +
     cases hT' with
     | abs hT₂ =>
       apply Typed.abs
-      rw [← Fin.val_succ, shift_le_succ]
+      rw [← Fin.val_succ, shift_comm]
       · apply ih
         · rw [← insert_zero]
           exact weakening hT

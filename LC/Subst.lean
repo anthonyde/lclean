@@ -28,7 +28,7 @@ def unshift (c : Nat) : Term τ → Term τ
 notation "↑¹" t => shift 0 t
 notation "↑⁻¹" t => unshift 0 t
 
-theorem shift_le_succ {t : Term τ} {c₁ c₂ : Nat} :
+theorem shift_comm {t : Term τ} {c₁ c₂ : Nat} :
     c₁ ≤ c₂ → shift c₁ (shift c₂ t) = shift (c₂ + 1) (shift c₁ t) := by
   induction t generalizing c₁ c₂ <;> grind only [shift]
 
