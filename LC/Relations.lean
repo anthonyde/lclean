@@ -30,7 +30,7 @@ theorem multi_trans {R : α → α → Prop} : Transitive (Multi R) := by
   | step hx hy ih => exact .step hx (ih hy)
 
 def Deterministic (R : α → α → Prop) : Prop :=
-  ∀ t t₁ t₂, R t t₁ → R t t₂ → t₁ = t₂
+  ∀ {t t₁ t₂}, R t t₁ → R t t₂ → t₁ = t₂
 
 def NormalForm (R : α → α → Prop) (t : α) : Prop :=
   ¬(∃ t', R t t')

@@ -48,7 +48,7 @@ lemma cbv_pres_halt {t t' : Term Ty} (ht : t ⟶v t') : Halts CBV t ↔ Halts CB
       apply hN
       exists t'
     | step hs hs' =>
-      have := cbv_det _ _ _ ht hs
+      have := cbv_det ht hs
       subst t'
       exists s''
   · intro hH

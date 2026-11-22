@@ -99,7 +99,7 @@ theorem cbn_det : Deterministic (@CBN τ) := by
   induction ht₁ generalizing t₂ with
   | app hs₁ ih =>
     cases ht₂ with
-    | app hs₁' => rw [ih _ hs₁']
+    | app hs₁' => rw [ih hs₁']
     | abs => contradiction
   | abs => cases ht₂ <;> trivial
 
@@ -108,7 +108,7 @@ theorem cbv_det : Deterministic (@CBV τ) := by
   induction ht₁ generalizing t₂ with
   | app₁ hs₁ ih₁ =>
     cases ht₂ with
-    | app₁ hs₁' => rw [ih₁ _ hs₁']
+    | app₁ hs₁' => rw [ih₁ hs₁']
     | app₂ hv₁ hs₂ =>
       exfalso
       apply val_nf hv₁
@@ -120,7 +120,7 @@ theorem cbv_det : Deterministic (@CBV τ) := by
       exfalso
       apply val_nf hv
       exact ⟨_, hs₁⟩
-    | app₂ hv₁ hs₂' => rw [ih₂ _ hs₂']
+    | app₂ hv₁ hs₂' => rw [ih₂ hs₂']
     | appabs hv₂ =>
       exfalso
       apply val_nf hv₂
@@ -153,9 +153,9 @@ theorem nf_unique : Deterministic (NormalFormOf (@CBV τ)) := by
       apply hN₂
       exact ⟨_, hs⟩
     | @step _ u' _ hu hu' =>
-      have := cbv_det _ _ _ hs hu
+      have := cbv_det hs hu
       subst u'
-      exact ih _ hN₁ hu' hN₂
+      exact ih hN₁ hu' hN₂
 
 lemma val_halts {v : Term τ} : Val v → Halts CBV v := by
   intro hv
