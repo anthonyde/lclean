@@ -162,7 +162,7 @@ lemma val_halts {v : Term τ} : Val v → Halts CBV v := by
   exists v
   exact ⟨.refl, val_nf hv⟩
 
-lemma multi_app₂ {v t₂ t₂' : Term τ} : Val v → (t₂ ⟶*v t₂') → .app v t₂ ⟶*v .app v t₂' := by
+lemma multi_cbv_app₂ {v t₂ t₂' : Term τ} : Val v → (t₂ ⟶*v t₂') → .app v t₂ ⟶*v .app v t₂' := by
   intro hv ht₂
   induction ht₂ with
   | refl => exact .refl

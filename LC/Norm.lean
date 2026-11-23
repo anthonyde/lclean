@@ -312,7 +312,8 @@ lemma msub_R {n : Nat} {Δ : List Ty} {σ : List (Term Ty)} {T : Ty} {t : Term T
         have hv := nf_val hT₁' hN
         rw [← mextend_nil, ← mextend_cons] at hT₂'
         have hT₂'' := msub_pres (.cons hv hR' .nil) hT₂'
-        apply (multi_pres_R _ (multi_trans (multi_app₂ .abs hs) (multi_closed (.appabs hv)))).mpr
+        apply (multi_pres_R _ (multi_trans (multi_cbv_app₂ .abs hs)
+          (multi_closed (.appabs hv)))).mpr
         · rw [shift_closed hT₁']
           dsimp [msub] at hT₂''
           rw [unshift_closed hT₂'']
