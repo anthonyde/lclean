@@ -6,7 +6,7 @@ Authors: Anthony DeRossi
 
 namespace Syntax
 
--- Nameless STLC using de Bruijn indices
+-- Nameless λ-calculus using de Bruijn indices
 inductive Term (τ : Type) : Type
   | a : Term τ
   | var : Nat → Term τ

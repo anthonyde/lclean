@@ -1,8 +1,7 @@
 Lambda Calculus Proofs
 ======================
 
-This repository contains definitions and proofs for the simply-typed lambda
-calculus (STLC) in Lean 4.
+This repository contains definitions and proofs for the λ-calculus in Lean 4.
 
 The formalization uses a nameless representation (de Bruijn indices) for
 variables as defined in *Types and Programming Languages* [TAPL]. Terms are
