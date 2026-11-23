@@ -43,18 +43,10 @@ notation Γ " ⊢ " t " : " T => Typed Γ t T
 
 -- TAPL 9.3.4
 lemma canon_a {t : Term Ty} : Val t → (⬝ ⊢ t : .a) → t = .a := by
-  intro hv hT
-  cases hv with
-  | a => rfl
-  | abs => contradiction
+  grind only [Typed, Val]
 
 lemma canon_fn {T₁ T₂ : Ty} {t : Term Ty} : Val t → (⬝ ⊢ t : T₁ ⤳ T₂) → ∃ s, t = .abs T₁ s := by
-  intro hv hT
-  cases hv with
-  | a => exists .a
-  | abs =>
-    cases hT
-    exact ⟨_, rfl⟩
+  grind only [Typed, Val]
 
 -- TAPL 9.3.5
 theorem progress {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → Val t ∨ (∃ t', t ⟶v t') := by
@@ -78,24 +70,16 @@ theorem progress {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → Val t ∨ (∃ t',
         cases ih₂ hT₂ with
         | inl hv₂ =>
           obtain ⟨t', rfl⟩ := canon_fn hv₁ hT₁
-          exists β t' t₂
-          exact .appabs hv₂
+          exact ⟨_, .appabs hv₂⟩
         | inr ht₂ =>
           obtain ⟨t₂', ht₂⟩ := ht₂
-          exists .app t₁ t₂'
-          exact .app₂ hv₁ ht₂
+          exact ⟨_, .app₂ hv₁ ht₂⟩
       | inr ht₁ =>
         obtain ⟨t₁', ht₁⟩ := ht₁
-        exists .app t₁' t₂
-        exact .app₁ ht₁
+        exact ⟨_, .app₁ ht₁⟩
 
 lemma nf_val {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → NormalForm CBV t → Val t := by
-  intro hT hN
-  cases progress hT with
-  | inl hv => exact hv
-  | inr ht =>
-    exfalso
-    exact hN ht
+  grind only [NormalForm, Typed, progress]
 
 -- A context with an insertion types a term shifted s.t. there is a hole at the inserted index.
 theorem weakening {n : Nat} {Γ : Ctx n} {T T' : Ty} {t : Term Ty} {c : Fin n.succ} :
@@ -136,30 +120,24 @@ theorem weakening {n : Nat} {Γ : Ctx n} {T T' : Ty} {t : Term Ty} {c : Fin n.su
 
 lemma shift_closed' {n : Nat} {Γ : Ctx n} {T : Ty} {t : Term Ty} {c : Nat} :
     n ≤ c → (Γ ⊢ t : T) → shift c t = t := by
-  intro hc hT
-  induction t generalizing n T c <;> cases hT <;> dsimp [shift] <;> grind only
+  induction t generalizing n T c <;> grind only [Typed, shift]
 
-lemma shift_closed {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → (↑¹t) = t := by
-  apply shift_closed'
-  linarith
+lemma shift_closed {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → (↑¹t) = t :=
+  shift_closed' (by linarith)
 
 lemma unshift_closed' {n : Nat} {Γ : Ctx n} {T : Ty} {t : Term Ty} {c : Nat} :
     n ≤ c → (Γ ⊢ t : T) → unshift c t = t := by
-  intro hc hT
-  induction t generalizing n T c <;> cases hT <;> dsimp [unshift] <;> grind only
+  induction t generalizing n T c <;> grind only [Typed, unshift]
 
-lemma unshift_closed {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → (↑⁻¹t) = t := by
-  apply unshift_closed'
-  linarith
+lemma unshift_closed {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → (↑⁻¹t) = t :=
+  unshift_closed' (by linarith)
 
 lemma sub_closed' {n j : Nat} {Γ : Ctx n} {T : Ty} {t s : Term Ty} :
     n ≤ j → (Γ ⊢ t : T) → ([j ↦ s] t) = t := by
-  intro hj hT
-  induction t generalizing n j T s <;> cases hT <;> dsimp [sub] <;> grind only
+  induction t generalizing n j T s <;> grind only [Typed, sub]
 
-lemma sub_closed {T : Ty} {t s : Term Ty} {j : Nat} : (⬝ ⊢ t : T) → ([j ↦ s] t) = t := by
-  apply sub_closed'
-  linarith
+lemma sub_closed {T : Ty} {t s : Term Ty} {j : Nat} : (⬝ ⊢ t : T) → ([j ↦ s] t) = t :=
+  sub_closed' (by linarith)
 
 lemma weakening_closed {n : Nat} {Γ : Ctx n} {T : Ty} {t : Term Ty} :
     (⬝ ⊢ t : T) → (Γ ⊢ t : T) := by

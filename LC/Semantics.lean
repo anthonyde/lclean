@@ -111,27 +111,23 @@ theorem cbv_det : Deterministic (@CBV τ) := by
     | app₁ hs₁' => rw [ih₁ hs₁']
     | app₂ hv₁ hs₂ =>
       exfalso
-      apply val_nf hv₁
-      exact ⟨_, hs₁⟩
+      exact val_nf hv₁ ⟨_, hs₁⟩
     | appabs hv₂ => contradiction
   | app₂ hv hs₂ ih₂ =>
     cases ht₂ with
     | app₁ hs₁ =>
       exfalso
-      apply val_nf hv
-      exact ⟨_, hs₁⟩
+      exact val_nf hv ⟨_, hs₁⟩
     | app₂ hv₁ hs₂' => rw [ih₂ hs₂']
     | appabs hv₂ =>
       exfalso
-      apply val_nf hv₂
-      exact ⟨_, hs₂⟩
+      exact val_nf hv₂ ⟨_, hs₂⟩
   | appabs hv =>
     cases ht₂ with
     | app₁ hs₂ => contradiction
     | app₂ hv₂ hv' =>
       exfalso
-      apply val_nf hv
-      exact ⟨_, hv'⟩
+      exact val_nf hv ⟨_, hv'⟩
     | appabs hv₂ => rfl
 
 theorem nf_unique : Deterministic (NormalFormOf (@CBV τ)) := by
@@ -144,14 +140,12 @@ theorem nf_unique : Deterministic (NormalFormOf (@CBV τ)) := by
     | refl => rfl
     | step hs hs' =>
       exfalso
-      apply hN₁
-      exact ⟨_, hs⟩
+      exact hN₁ ⟨_, hs⟩
   | step hs hs' ih =>
     cases ht₂ with
     | refl =>
       exfalso
-      apply hN₂
-      exact ⟨_, hs⟩
+      exact hN₂ ⟨_, hs⟩
     | @step _ u' _ hu hu' =>
       have := cbv_det hs hu
       subst u'
@@ -159,8 +153,7 @@ theorem nf_unique : Deterministic (NormalFormOf (@CBV τ)) := by
 
 lemma val_halts {v : Term τ} : Val v → Halts CBV v := by
   intro hv
-  exists v
-  exact ⟨.refl, val_nf hv⟩
+  exact ⟨_, .refl, val_nf hv⟩
 
 lemma multi_cbv_app₂ {v t₂ t₂' : Term τ} : Val v → (t₂ ⟶*v t₂') → .app v t₂ ⟶*v .app v t₂' := by
   intro hv ht₂

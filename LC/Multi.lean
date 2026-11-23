@@ -91,8 +91,7 @@ lemma mextend_mem {Δ : List τ} {n : Nat} {Γ : Ctx n} {i : Fin (Δ.length + n)
 
 lemma mextend_nil : mextend (@List.nil τ) ⬝ = ⬝ := rfl
 
-lemma mextend_cons {Δ : List τ} {T : τ} :
-    mextend (T :: Δ) ⬝ = (mextend Δ ⬝).extend T := rfl
+lemma mextend_cons {Δ : List τ} {T : τ} : mextend (T :: Δ) ⬝ = (mextend Δ ⬝).extend T := rfl
 
 lemma mextend_extend {Δ : List τ} {n : Nat} {Γ : Ctx n} {T : τ} :
     (mextend Δ Γ).extend T = mextend Δ (Γ.extend T) := rfl

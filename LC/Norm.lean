@@ -53,8 +53,7 @@ lemma cbv_pres_halt {t t' : Term Ty} (ht : t ⟶v t') : Halts CBV t ↔ Halts CB
       exists s''
   · intro hH
     obtain ⟨t'', ht', hN⟩ := hH
-    exists t''
-    exact ⟨.step ht ht', hN⟩
+    exact ⟨_, .step ht ht', hN⟩
 
 lemma cbv_pres_R' {T : Ty} {t t' : Term Ty} : (t ⟶v t') → R T t → R T t' := by
   intro ht hR
@@ -126,39 +125,15 @@ lemma msub_closed' {n j : Nat} {Γ : Ctx n} {T : Ty} {t : Term Ty} {σ : List (T
     rw [ih _ hT, sub_closed' _ hT] <;> linarith
 
 lemma msub_closed {T : Ty} {t : Term Ty} {j : Nat} {σ : List (Term Ty)} :
-    (⬝ ⊢ t : T) → msub j σ t = t := by
-  apply msub_closed'
-  linarith
+    (⬝ ⊢ t : T) → msub j σ t = t :=
+  msub_closed' (by linarith)
 
-lemma msub_a {j : Nat} {σ : List (Term Ty)} : msub j σ .a = .a := by
-  exact msub_closed .a
+lemma msub_a {j : Nat} {σ : List (Term Ty)} : msub j σ .a = .a :=
+  msub_closed .a
 
 lemma sub_comm {i j : Nat} {T T' : Ty} {t s s' : Term Ty} :
     (⬝ ⊢ s : T) → (⬝ ⊢ s' : T') → i ≠ j → [i ↦ s] ([j ↦ s'] t) = [j ↦ s'] ([i ↦ s] t) := by
-  intro hT hT' hi
-  induction t generalizing i j s s' with
-  | a => rfl
-  | var k =>
-    dsimp [sub]
-    split <;> split
-    · grind only
-    · dsimp [sub]
-      split
-      · rw [sub_closed hT']
-      · contradiction
-    · dsimp [sub]
-      split
-      · rw [sub_closed hT]
-      · contradiction
-    · dsimp [sub]
-      grind only
-  | abs T₁ t ih =>
-    dsimp [sub]
-    rw [shift_closed hT, shift_closed hT', ih hT hT']
-    grind only
-  | app t₁ t₂ ih₁ ih₂ =>
-    dsimp [sub]
-    rw [ih₁ hT hT' hi, ih₂ hT hT' hi]
+  induction t generalizing i j s s' <;> grind only [shift_closed, sub, sub_closed]
 
 lemma sub_msub_comm {i j : Nat} {σ : List (Term Ty)} {T : Ty} {t s : Term Ty} :
     (⬝ ⊢ s : T) → ClosedEnv σ → i < j → [i ↦ s] (msub j σ t) = msub j σ ([i ↦ s] t) := by
@@ -191,15 +166,7 @@ lemma msub_var {j k : Nat} {σ : List (Term Ty)} :
 
 lemma msub_abs {j : Nat} {σ : List (Term Ty)} {T : Ty} {t : Term Ty} :
     ClosedEnv σ → msub j σ (.abs T t) = .abs T (msub (j + 1) σ t) := by
-  intro hC
-  induction σ generalizing j t with
-  | nil => rfl
-  | cons v σ' ih =>
-    obtain ⟨⟨T', hT'⟩, hC'⟩ := hC
-    dsimp [msub]
-    rw [ih hC']
-    dsimp [sub]
-    rw [shift_closed hT']
+  induction σ generalizing j t <;> grind only [ClosedEnv, msub, shift_closed, sub]
 
 lemma msub_app {j : Nat} {σ : List (Term Ty)} {t₁ t₂ : Term Ty} :
     msub j σ (.app t₁ t₂) = .app (msub j σ t₁) (msub j σ t₂) := by
@@ -224,10 +191,7 @@ lemma inst_closed_env {n : Nat} {Δ : List Ty} {σ : List (Term Ty)} : Inst n Δ
   intro hI
   induction hI with
   | nil => constructor
-  | cons hv hR hI' ih =>
-    constructor
-    · exact ⟨_, R_closed_wt hR⟩
-    · exact ih
+  | cons hv hR hI' ih => exact ⟨⟨_, R_closed_wt hR⟩, ih⟩
 
 lemma inst_R {n : Nat} {Δ : List Ty} {σ : List (Term Ty)} :
     (hI : Inst n Δ σ) → ∀ (i : Nat) T t, (h : i < n) →
