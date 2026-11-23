@@ -20,7 +20,7 @@ inductive CBN : Term τ → Term τ → Prop
     CBN t₁ t₁' →
     CBN (.app t₁ t₂) (.app t₁' t₂)
   | abs : ∀ {T t₁ t₂},
-    CBN (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂] t₁)
+    CBN (.app (.abs T t₁) t₂) (β t₁ t₂)
 
 notation t " ⟶n " t' => CBN t t'
 notation t " ⟶*n " t' => Multi CBN t t'
@@ -41,7 +41,7 @@ inductive CBV : Term τ → Term τ → Prop
     CBV (.app v t₂) (.app v t₂')
   | appabs : ∀ {T t v},
     Val v →
-    CBV (.app (.abs T t) v) (↑⁻¹[0 ↦ ↑¹v] t)
+    CBV (.app (.abs T t) v) (β t v)
 
 notation t " ⟶v " t' => CBV t t'
 notation t " ⟶*v " t' => Multi CBV t t'
@@ -58,7 +58,7 @@ inductive Beta : Term τ → Term τ → Prop
     Beta t₂ t₂' →
     Beta (.app t₁ t₂) (.app t₁ t₂')
   | appabs : ∀ {T t₁ t₂},
-    Beta (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂] t₁)
+    Beta (.app (.abs T t₁) t₂) (β t₁ t₂)
 
 notation t " ⟶β " t' => Beta t t'
 notation t " ⟶*β " t' => Multi Beta t t'
@@ -78,7 +78,7 @@ inductive PBeta : Term τ → Term τ → Prop
   | appabs : ∀ {T t₁ t₁' t₂ t₂'},
     PBeta t₁ t₁' →
     PBeta t₂ t₂' →
-    PBeta (.app (.abs T t₁) t₂) (↑⁻¹[0 ↦ ↑¹t₂'] t₁')
+    PBeta (.app (.abs T t₁) t₂) (β t₁' t₂')
 
 notation t " ⟹β " t' => PBeta t t'
 notation t " ⟹*β " t' => Multi PBeta t t'
@@ -295,14 +295,13 @@ lemma pbeta_sub {t t' s s' : Term τ} {j : Nat} :
       exact .appabs (pbeta_abs_inv (ih₁ (.abs ht₁) hs)) (ih₂ ht₂ hs)
 
 -- Takahashi1995 §1 (3)
-lemma pbeta_β {t t' s s' : Term τ} :
-    (t ⟹β t') → (s ⟹β s') → (↑⁻¹[0 ↦ ↑¹s] t) ⟹β ↑⁻¹[0 ↦ ↑¹s'] t' := by
+lemma pbeta_β {t t' s s' : Term τ} : (t ⟹β t') → (s ⟹β s') → (β t s) ⟹β β t' s' := by
   intro ht hs
   exact pbeta_unshift (sub_pres_not_fv shift_not_fv) (pbeta_sub ht (pbeta_shift hs))
 
 lemma pbeta_appabs_inv {T : τ} {t₁ t₂ t' : Term τ} :
     (.app (.abs T t₁) t₂ ⟹β t') →
-    ∃ t₁' t₂', (t₁ ⟹β t₁') ∧ (t₂ ⟹β t₂') ∧ (t' = .app (.abs T t₁') t₂' ∨ t' = ↑⁻¹[0 ↦ ↑¹t₂'] t₁') := by
+    ∃ t₁' t₂', (t₁ ⟹β t₁') ∧ (t₂ ⟹β t₂') ∧ (t' = .app (.abs T t₁') t₂' ∨ t' = β t₁' t₂') := by
   intro ht
   cases ht with
   | refl => exact ⟨_, _, .refl, .refl, .inl rfl⟩
@@ -316,7 +315,7 @@ def star : Term τ → Term τ
   | .a => .a
   | .var k => .var k
   | .abs T t => .abs T (star t)
-  | .app (.abs _ t₁) t₂ => ↑⁻¹[0 ↦ ↑¹(star t₂)] (star t₁)
+  | .app (.abs _ t₁) t₂ => β (star t₁) (star t₂)
   | .app t₁ t₂ => .app (star t₁) (star t₂)
 theorem pbeta_star {t t' : Term τ} : (t ⟹β t') → t' ⟹β star t := by
   intro ht

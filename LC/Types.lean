@@ -78,7 +78,7 @@ theorem progress {T : Ty} {t : Term Ty} : (⬝ ⊢ t : T) → Val t ∨ (∃ t',
         cases ih₂ hT₂ with
         | inl hv₂ =>
           obtain ⟨t', rfl⟩ := canon_fn hv₁ hT₁
-          exists ↑⁻¹[0 ↦ ↑¹t₂] t'
+          exists β t' t₂
           exact .appabs hv₂
         | inr ht₂ =>
           obtain ⟨t₂', ht₂⟩ := ht₂
@@ -228,7 +228,7 @@ lemma β_pres' {n : Nat} {Γ : Ctx n} {T T' : Ty} {t t' : Term Ty} {c : Fin (n +
 
 -- TAPL 9.3.8
 lemma β_pres {n : Nat} {Γ : Ctx n} {T T' : Ty} {t t' : Term Ty} :
-    (Γ ⊢ t : T) → (Γ.extend T ⊢ t' : T') → Γ ⊢ ↑⁻¹[0 ↦ ↑¹t] t' : T' := by
+    (Γ ⊢ t : T) → (Γ.extend T ⊢ t' : T') → Γ ⊢ β t' t : T' := by
   rw [← insert_zero]
   exact β_pres'
 

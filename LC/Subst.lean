@@ -90,13 +90,16 @@ theorem sub_unshift_comm {t s : Term τ} {c j : Nat} (hf : ¬fv s c) (hf' : ¬fv
     grind only [fv, shift_pres_not_fv, shift_unshift_comm, sub, unshift]
 
 -- β-reduction
+abbrev β (t s : Term τ) : Term τ := ↑⁻¹[0 ↦ ↑¹s] t
+
 theorem β_pres_not_fv {t s : Term τ} {j : Nat} (hf : ¬fv s j) (hf' : ¬fv t (j + 1)) :
-    ¬fv (↑⁻¹[0 ↦ ↑¹s] t) j := by
+    ¬fv (β t s) j := by
   apply unshift_pres_not_fv (sub_pres_not_fv shift_not_fv)
     (sub_pres_not_fv_ne (shift_pres_not_fv hf _) hf' _) <;> omega
 
 theorem β_shift_comm {t s : Term τ} {c : Nat} :
-    shift c (↑⁻¹[0 ↦ ↑¹s] t) = ↑⁻¹[0 ↦ ↑¹(shift c s)] (shift (c + 1) t) := by
+    shift c (β t s) = β (shift (c + 1) t) (shift c s) := by
+  unfold β
   generalize hc' : 0 = c'
   have hc : c' ≤ c := by omega
   revert hc
@@ -104,11 +107,12 @@ theorem β_shift_comm {t s : Term τ} {c : Nat} :
   induction t generalizing s c c' <;> grind only [shift, shift_comm, shift_unshift, sub, unshift]
 
 theorem β_unshift_comm {t s : Term τ} {c : Nat} (hf : ¬fv s c) (hf' : ¬fv t (c + 1)) :
-    unshift c (↑⁻¹[0 ↦ ↑¹s] t) = ↑⁻¹[0 ↦ ↑¹(unshift c s)] (unshift (c + 1) t) := by
+    unshift c (β t s) = β (unshift (c + 1) t) (unshift c s) := by
   grind only [shift_pres_not_fv, shift_unshift_comm, sub_unshift_comm, unshift_comm]
 
 theorem β_sub_comm {t s₁ s₂ : Term τ} {j : Nat} :
-    [j ↦ s₂] (↑⁻¹[0 ↦ ↑¹s₁] t) = ↑⁻¹[0 ↦ ↑¹[j ↦ s₂] s₁] ([j + 1 ↦ ↑¹s₂] t) := by
+    [j ↦ s₂] (β t s₁) = β ([j + 1 ↦ ↑¹s₂] t) ([j ↦ s₂] s₁) := by
+  unfold β
   generalize hc : 0 = c
   have hj : c ≤ j := by omega
   revert hj
