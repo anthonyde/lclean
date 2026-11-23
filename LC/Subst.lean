@@ -55,7 +55,46 @@ theorem sub_shift_comm {t s : Term τ} {c j : Nat} :
     c ≤ j → shift c ([j ↦ s] t) = [j + 1 ↦ shift c s] (shift c t) := by
   induction t generalizing s c j <;> grind only [shift, shift_comm, sub]
 
+-- Free variables of a term
+def fv : Term τ → Nat → Prop
+  | .a, _ => False
+  | .var k, j => j = k
+  | .abs _ t, j => fv t (j + 1)
+  | .app t₁ t₂, j => fv t₁ j ∨ fv t₂ j
+
+theorem shift_not_fv {t : Term τ} {c : Nat} : ¬fv (shift c t) c := by
+  induction t generalizing c <;> grind only [fv, shift]
+
+theorem shift_pres_not_fv {t : Term τ} {c j : Nat} (hf : ¬fv t j) :
+    c ≤ j → ¬fv (shift c t) (j + 1) := by
+  induction t generalizing c j <;> grind only [fv, shift]
+
+theorem unshift_pres_not_fv {t : Term τ} {c j : Nat} (hf : ¬fv t c) (hf' : ¬fv t (j + 1)) :
+    c ≤ j → ¬fv (unshift c t) j := by
+  induction t generalizing c j <;> grind only [fv, unshift]
+
+theorem sub_pres_not_fv {t s : Term τ} {j : Nat} (hf : ¬fv s j) : ¬fv ([j ↦ s] t) j := by
+  induction t generalizing s j <;> grind only [fv, shift_pres_not_fv, sub]
+
+theorem sub_pres_not_fv_ne {t s : Term τ} {j k : Nat} (hf : ¬fv s k) (hf' : ¬fv t k) :
+    j ≠ k → ¬fv ([j ↦ s] t) k := by
+  induction t generalizing s j k <;> grind only [fv, shift_pres_not_fv, sub]
+
+theorem shift_unshift_comm {t : Term τ} {c₁ c₂ : Nat} (hf : ¬fv t c₂) :
+    c₁ ≤ c₂ → unshift (c₂ + 1) (shift c₁ t) = shift c₁ (unshift c₂ t) := by
+  induction t generalizing c₁ c₂ <;> grind only [fv, shift, unshift]
+
+theorem sub_unshift_comm {t s : Term τ} {c j : Nat} (hf : ¬fv s c) (hf' : ¬fv t c) :
+    j < c → unshift c ([j ↦ s] t) = [j ↦ unshift c s] (unshift c t) := by
+  induction t generalizing s c j <;>
+    grind only [fv, shift_pres_not_fv, shift_unshift_comm, sub, unshift]
+
 -- β-reduction
+theorem β_pres_not_fv {t s : Term τ} {j : Nat} (hf : ¬fv s j) (hf' : ¬fv t (j + 1)) :
+    ¬fv (↑⁻¹[0 ↦ ↑¹s] t) j := by
+  apply unshift_pres_not_fv (sub_pres_not_fv shift_not_fv)
+    (sub_pres_not_fv_ne (shift_pres_not_fv hf _) hf' _) <;> omega
+
 theorem β_shift_comm {t s : Term τ} {c : Nat} :
     shift c (↑⁻¹[0 ↦ ↑¹s] t) = ↑⁻¹[0 ↦ ↑¹(shift c s)] (shift (c + 1) t) := by
   generalize hc' : 0 = c'
@@ -63,6 +102,10 @@ theorem β_shift_comm {t s : Term τ} {c : Nat} :
   revert hc
   clear hc'
   induction t generalizing s c c' <;> grind only [shift, shift_comm, shift_unshift, sub, unshift]
+
+theorem β_unshift_comm {t s : Term τ} {c : Nat} (hf : ¬fv s c) (hf' : ¬fv t (c + 1)) :
+    unshift c (↑⁻¹[0 ↦ ↑¹s] t) = ↑⁻¹[0 ↦ ↑¹(unshift c s)] (unshift (c + 1) t) := by
+  grind only [shift_pres_not_fv, shift_unshift_comm, sub_unshift_comm, unshift_comm]
 
 theorem β_sub_comm {t s₁ s₂ : Term τ} {j : Nat} :
     [j ↦ s₂] (↑⁻¹[0 ↦ ↑¹s₁] t) = ↑⁻¹[0 ↦ ↑¹[j ↦ s₂] s₁] ([j + 1 ↦ ↑¹s₂] t) := by
