@@ -32,6 +32,9 @@ theorem multi_trans {R : α → α → Prop} : Transitive (Multi R) := by
 def Deterministic (R : α → α → Prop) : Prop :=
   ∀ {t t₁ t₂}, R t t₁ → R t t₂ → t₁ = t₂
 
+def Diamond (R : α → α → Prop) : Prop :=
+  ∀ {t s₁ s₂}, R t s₁ → R t s₂ → ∃ t', R s₁ t' ∧ R s₂ t'
+
 def NormalForm (R : α → α → Prop) (t : α) : Prop :=
   ¬(∃ t', R t t')
 
