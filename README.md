@@ -10,8 +10,12 @@ not dependently typed.
 Main Theorems
 -------------
 
+  * Church-Rosser (`LC/Semantics.lean`)
   * Progress and preservation for STLC (`LC/Types.lean`)
   * Strong normalization for STLC (`LC/Norm.lean`)
+
+The Church-Rosser proof uses the simultaneous contraction method described in
+*Parallel Reductions in λ-Calculus* [Takahashi1995].
 
 The structure of the strong normalization proof follows the logical relations
 approach used in *Software Foundations Vol. 2* [SF2].
@@ -39,5 +43,9 @@ References
 
 * [TAPL] Types and Programming Languages, by Benjamin C. Pierce.
   MIT Press, 2002.
+
+* [Takahashi1995] Takahashi, Masako. "Parallel Reductions in λ-Calculus."
+  *Information and Computation* 118(1): 120-127, 1995.
+  [DOI](https://doi.org/10.1006/inco.1995.1057)
 
 See `references.bib` for complete reference information.
