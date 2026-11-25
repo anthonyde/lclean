@@ -223,7 +223,7 @@ lemma multi_beta_closed {t t' : Term τ} : (t ⟹β t') → t ⟶*β t' := by
       exact multi_trans (multi_beta_app₁ (ih₁ (.abs ht₁))) (multi_trans (multi_beta_app₂ (ih₂ ht₂))
         (multi_closed .appabs))
 
-lemma pbeta_free_pres {t t' : Term τ} {j : Nat} : (t ⟹β t') → ¬fv t j → ¬fv t' j := by
+lemma pbeta_pres_not_fv {t t' : Term τ} {j : Nat} : (t ⟹β t') → ¬fv t j → ¬fv t' j := by
   intro ht hf
   induction ht generalizing j with
   | refl => exact hf
@@ -259,8 +259,8 @@ lemma pbeta_unshift {t t' : Term τ} {c : Nat} :
     obtain ⟨hf₁, hf₂⟩ := hf
     rw [β_unshift_comm]
     · exact .appabs (ih₁ hf₁) (ih₂ hf₂)
-    · exact pbeta_free_pres ht₂ hf₂
-    · exact pbeta_free_pres ht₁ hf₁
+    · exact pbeta_pres_not_fv ht₂ hf₂
+    · exact pbeta_pres_not_fv ht₁ hf₁
 
 lemma pbeta_sub {t t' s s' : Term τ} {j : Nat} :
     (t ⟹β t') → (s ⟹β s') → ([j ↦ s] t) ⟹β [j ↦ s'] t' := by
