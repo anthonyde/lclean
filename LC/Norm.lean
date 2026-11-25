@@ -117,12 +117,7 @@ def ClosedEnv : List (Term Ty) → Prop
 
 lemma msub_closed' {n j : Nat} {Γ : Ctx n} {T : Ty} {t : Term Ty} {σ : List (Term Ty)} :
     n ≤ j → (Γ ⊢ t : T) → msub j σ t = t := by
-  intro hj hT
-  induction σ generalizing n j with
-  | nil => rfl
-  | cons v σ' ih =>
-    dsimp [msub]
-    rw [ih _ hT, sub_closed' _ hT] <;> linarith
+  induction σ generalizing n j <;> grind only [msub, sub_closed']
 
 lemma msub_closed {T : Ty} {t : Term Ty} {j : Nat} {σ : List (Term Ty)} :
     (⬝ ⊢ t : T) → msub j σ t = t :=
@@ -137,13 +132,7 @@ lemma sub_comm {i j : Nat} {T T' : Ty} {t s s' : Term Ty} :
 
 lemma sub_msub_comm {i j : Nat} {σ : List (Term Ty)} {T : Ty} {t s : Term Ty} :
     (⬝ ⊢ s : T) → ClosedEnv σ → i < j → [i ↦ s] (msub j σ t) = msub j σ ([i ↦ s] t) := by
-  intro hT hσ hi
-  induction σ generalizing j with
-  | nil => rfl
-  | cons s' σ' ih =>
-    obtain ⟨⟨T', hT'⟩, hσ'⟩ := hσ
-    dsimp [msub]
-    rw [sub_comm hT hT', ih hσ'] <;> linarith
+  induction σ generalizing j <;> grind only [ClosedEnv, msub, sub_comm]
 
 lemma msub_var {j k : Nat} {σ : List (Term Ty)} :
     ClosedEnv σ → msub j σ (.var k) =
@@ -170,12 +159,7 @@ lemma msub_abs {j : Nat} {σ : List (Term Ty)} {T : Ty} {t : Term Ty} :
 
 lemma msub_app {j : Nat} {σ : List (Term Ty)} {t₁ t₂ : Term Ty} :
     msub j σ (.app t₁ t₂) = .app (msub j σ t₁) (msub j σ t₂) := by
-  induction σ generalizing j t₁ t₂ with
-  | nil => rfl
-  | cons v σ' ih =>
-    dsimp [msub]
-    rw [ih]
-    rfl
+  induction σ generalizing j t₁ t₂ <;> grind only [msub, sub]
 
 lemma inst_Δ_length_eq {n : Nat} {Δ : List Ty} {σ : List (Term Ty)} :
     Inst n Δ σ → Δ.length = n := by

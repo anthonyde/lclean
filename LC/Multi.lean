@@ -48,11 +48,10 @@ lemma mcat_mem {n m : Nat} {Γ₁ : @Ctx τ n} {Γ₂ : @Ctx τ m} {i : Fin (n +
     rw [dite_cond_eq_true (by grind only)]
     rfl
   | @extend n' Γ₂' T ih =>
-    unfold mcat
     cases i using Fin.cases with
     | zero => rfl
     | succ i' =>
-      rw [extend_mem_succ, ih]
+      rw [mcat, extend_mem_succ, ih]
       split <;> split
       case extend.succ.isTrue.isTrue =>
         congr 1
@@ -82,8 +81,7 @@ lemma mextend_mem {Δ : List τ} {n : Nat} {Γ : Ctx n} {i : Fin (Δ.length + n)
           simp_all only [Fin.val_succ]
           linarith
   | cons T Δ' ih =>
-    dsimp [mextend]
-    rw [mcat_mem]
+    rw [mextend, mcat_mem]
     split
     · rw [mbuild_mem]
       rfl

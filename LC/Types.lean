@@ -213,25 +213,12 @@ lemma β_pres {n : Nat} {Γ : Ctx n} {T T' : Ty} {t t' : Term Ty} :
 -- TAPL 9.3.9
 theorem preservation {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → (t ⟶v t') → ⬝ ⊢ t' : T := by
   intro hT hs
-  induction hs generalizing T with
-  | app₁ ht₁ ih₁ =>
-    cases hT with
-    | app hT₁ hT₂ => exact .app (ih₁ hT₁) hT₂
-  | app₂ hv ht₂ ih₂ =>
-    cases hT with
-    | app hT₁ hT₂ => exact .app hT₁ (ih₂ hT₂)
-  | appabs hv =>
-    cases hT with
-    | app hT₁ hT₂ =>
-      cases hT₁ with
-      | abs hT => exact β_pres hT₂ hT
+  induction hs generalizing T <;> grind only [Typed, β_pres]
 
 lemma nf_pres {T : Ty} {t t' : Term Ty} : (⬝ ⊢ t : T) → NormalFormOf CBV t t' → (⬝ ⊢ t' : T) := by
   intro hT hN
   obtain ⟨ht, hN⟩ := hN
-  induction ht with
-  | refl => exact hT
-  | step hs₁ hs₂ ih => exact ih (preservation hT hs₁) hN
+  induction ht <;> grind only [preservation]
 
 lemma halts_val {T : Ty} {t t' : Term Ty} :
     (⬝ ⊢ t : T) → Halts CBV t → NormalFormOf CBV t t' → Val t' := by
